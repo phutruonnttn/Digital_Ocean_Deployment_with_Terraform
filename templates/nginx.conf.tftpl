@@ -21,7 +21,8 @@ http {
 
     upstream api_gateway {
         least_conn;
-        server ${api_gateway_ip}:${api_gateway_port};
+        # server ${api_gateway_ip}:${api_gateway_port}; # use when want to seperate nginx to other droplet
+        server ${api_gateway_ip}:8080;
     }
 
     server {

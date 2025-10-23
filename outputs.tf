@@ -20,14 +20,16 @@ output "api_gateway_url" {
 }
 
 # Load Balancer
-output "load_balancer_ip" {
-  description = "IP address of load balancer"
-  value       = digitalocean_droplet.load_balancer.ipv4_address
-}
+#output "load_balancer_ip" {
+#  description = "IP address of load balancer"
+#  value       = digitalocean_droplet.load_balancer.ipv4_address
+#}
 
+# Application URL (now served by infrastructure)
 output "application_url" {
   description = "Public application URL"
-  value       = "http://${digitalocean_droplet.load_balancer.ipv4_address}"
+  #value       = "http://${digitalocean_droplet.load_balancer.ipv4_address}"
+  value       = "http://${digitalocean_droplet.infrastructure.ipv4_address}"
 }
 
 # Business Services
@@ -41,10 +43,10 @@ output "content_service_ip" {
   value       = digitalocean_droplet.content_service.ipv4_address
 }
 
-output "analytics_service_ip" {
-  description = "IP address of analytics service"
-  value       = digitalocean_droplet.analytics_service.ipv4_address
-}
+#output "analytics_service_ip" {
+#  description = "IP address of analytics service"
+#  value       = digitalocean_droplet.analytics_service.ipv4_address
+#}
 
 output "engagement_service_ip" {
   description = "IP address of engagement service"
@@ -67,10 +69,10 @@ output "content_db_ip" {
   value       = digitalocean_droplet.content_db.ipv4_address
 }
 
-output "analytics_db_ip" {
-  description = "IP address of analytics database"
-  value       = digitalocean_droplet.analytics_db.ipv4_address
-}
+#output "analytics_db_ip" {
+#  description = "IP address of analytics database"
+#  value       = digitalocean_droplet.analytics_db.ipv4_address
+#}
 
 output "engagement_db_ip" {
   description = "IP address of engagement database"
@@ -88,7 +90,7 @@ output "service_endpoints" {
   value = {
     user_service = "${digitalocean_droplet.user_service.ipv4_address}:8081"
     content_service = "${digitalocean_droplet.content_service.ipv4_address}:8082"
-    analytics_service = "${digitalocean_droplet.analytics_service.ipv4_address}:8083"
+    #analytics_service = "${digitalocean_droplet.analytics_service.ipv4_address}:8083"
     engagement_service = "${digitalocean_droplet.engagement_service.ipv4_address}:8084"
     gamification_service = "${digitalocean_droplet.gamification_service.ipv4_address}:8085"
   }
@@ -103,8 +105,8 @@ output "database_endpoints" {
     content_postgres = "${digitalocean_droplet.content_db.ipv4_address}:5432"
     content_redis = "${digitalocean_droplet.content_db.ipv4_address}:6379"
     content_elasticsearch = "${digitalocean_droplet.content_db.ipv4_address}:9200"
-    analytics_postgres = "${digitalocean_droplet.analytics_db.ipv4_address}:5432"
-    analytics_redis = "${digitalocean_droplet.analytics_db.ipv4_address}:6379"
+    #analytics_postgres = "${digitalocean_droplet.analytics_db.ipv4_address}:5432"
+    #analytics_redis = "${digitalocean_droplet.analytics_db.ipv4_address}:6379"
     engagement_postgres = "${digitalocean_droplet.engagement_db.ipv4_address}:5432"
     engagement_redis = "${digitalocean_droplet.engagement_db.ipv4_address}:6379"
     gamification_postgres = "${digitalocean_droplet.gamification_db.ipv4_address}:5432"
@@ -114,7 +116,8 @@ output "database_endpoints" {
 
 # Connection file for SSH access
 resource "local_file" "ssh_connection_file" {
-  filename = "root@${digitalocean_droplet.load_balancer.ipv4_address}"
+  #filename = "root@${digitalocean_droplet.load_balancer.ipv4_address}"
+  filename = "root@${digitalocean_droplet.infrastructure.ipv4_address}"
   content  = ""
   file_permission = "0444"
 }

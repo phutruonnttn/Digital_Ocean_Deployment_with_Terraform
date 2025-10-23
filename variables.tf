@@ -20,19 +20,19 @@ variable "do_image" {
 variable "do_size_small" {
   description = "Small droplet size for infrastructure services"
   type        = string
-  default     = "s-1vcpu-1gb"  # $6/month
+  default     = "s-1vcpu-512mb-10gb"  # $4/month
 }
 
 variable "do_size_medium" {
   description = "Medium droplet size for business services"
   type        = string
-  default     = "s-2vcpu-2gb"  # $12/month
+  default     = "s-1vcpu-512mb-10gb"  # $4/month
 }
 
 variable "do_size_large" {
   description = "Large droplet size for databases"
   type        = string
-  default     = "s-2vcpu-4gb"  # $24/month
+  default     = "s-1vcpu-512mb-10gb"  # $4/month
 }
 
 variable "do_ssh_key_name" {
@@ -48,23 +48,18 @@ variable "ssh_private_key" {
   default     = "~/.ssh/id_rsa"
 }
 
-# Docker Configuration
-variable "docker_host" {
-  description = "Docker host IP address"
-  type        = string
-}
-
-variable "docker_cert_path" {
-  description = "Docker certificate path"
-  type        = string
-  sensitive   = true
-}
-
 # Application Configuration
 variable "app_namespace" {
   description = "Application namespace prefix"
   type        = string
   default     = "yushan"
+}
+
+# GitHub Container Registry Configuration
+variable "github_username" {
+  description = "GitHub username for container registry"
+  type        = string
+  default     = "maugus0"
 }
 
 variable "environment" {

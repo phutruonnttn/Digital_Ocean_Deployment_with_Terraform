@@ -45,6 +45,13 @@ check_environment() {
         export SSH_PRIVATE_KEY_PATH="~/.ssh/id_rsa"
     fi
     
+    if [ -z "$GITHUB_USERNAME" ]; then
+        print_error "GITHUB_USERNAME environment variable is not set"
+        print_status "Please set your GitHub username for container registry:"
+        print_status "export GITHUB_USERNAME='your-github-username'"
+        exit 1
+    fi
+    
     print_success "Environment variables checked"
 }
 
@@ -62,25 +69,25 @@ check_terraform() {
     print_success "Terraform is installed: $(terraform --version | head -n1)"
 }
 
-# Check if Docker Machine is installed
+# Check if Docker Machine is installed (Optional)
 check_docker_machine() {
     print_status "Checking Docker Machine installation..."
     
-    if ! command -v docker-machine &> /dev/null; then
-        print_error "Docker Machine is not installed"
-        print_status "Please install Docker Machine first:"
-        print_status "curl -O https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.40/docker-machine-Linux-x86_64"
-        print_status "mv docker-machine-Linux-x86_64 docker-machine"
-        print_status "chmod +x docker-machine"
-        print_status "sudo mv docker-machine /usr/local/bin"
-        exit 1
-    fi
-    
-    print_success "Docker Machine is installed: $(docker-machine version | head -n1)"
+    print_warning "Skipping Docker Machine setup for cost optimization"
+    print_status "Using direct Terraform deployment without Docker Machine"
+    export SKIP_DOCKER_MACHINE=true
+    return 0
 }
 
-# Create Docker Machine for container management
+# Create Docker Machine for container management (Optional)
 create_docker_machine() {
+    if [ "$SKIP_DOCKER_MACHINE" = "true" ]; then
+        print_status "Skipping Docker Machine creation..."
+        export DOCKER_HOST_IP=""
+        export DOCKER_CERT_PATH=""
+        return 0
+    fi
+    
     print_status "Creating Docker Machine for container management..."
     
     if docker-machine ls | grep -q "yushan-docker-host"; then
@@ -119,11 +126,19 @@ init_terraform() {
 plan_terraform() {
     print_status "Planning Terraform deployment..."
     
-    terraform plan \
-        -var="do_token=$DO_PAT" \
-        -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
-        -var="docker_host=$DOCKER_HOST_IP" \
-        -var="docker_cert_path=$DOCKER_CERT_PATH"
+    if [ "$SKIP_DOCKER_MACHINE" = "true" ]; then
+        terraform plan \
+            -var="do_token=$DO_PAT" \
+            -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
+            -var="github_username=$GITHUB_USERNAME"
+    else
+        terraform plan \
+            -var="do_token=$DO_PAT" \
+            -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
+            -var="docker_host=$DOCKER_HOST_IP" \
+            -var="docker_cert_path=$DOCKER_CERT_PATH" \
+            -var="github_username=$GITHUB_USERNAME"
+    fi
     
     print_success "Terraform plan completed"
 }
@@ -132,11 +147,19 @@ plan_terraform() {
 apply_terraform() {
     print_status "Applying Terraform deployment..."
     
-    terraform apply -auto-approve \
-        -var="do_token=$DO_PAT" \
-        -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
-        -var="docker_host=$DOCKER_HOST_IP" \
-        -var="docker_cert_path=$DOCKER_CERT_PATH"
+    if [ "$SKIP_DOCKER_MACHINE" = "true" ]; then
+        terraform apply -auto-approve \
+            -var="do_token=$DO_PAT" \
+            -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
+            -var="github_username=$GITHUB_USERNAME"
+    else
+        terraform apply -auto-approve \
+            -var="do_token=$DO_PAT" \
+            -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
+            -var="docker_host=$DOCKER_HOST_IP" \
+            -var="docker_cert_path=$DOCKER_CERT_PATH" \
+            -var="github_username=$GITHUB_USERNAME"
+    fi
     
     print_success "Terraform deployment completed"
 }
@@ -169,17 +192,18 @@ show_results() {
 test_deployment() {
     print_status "Testing deployment..."
     
-    LOAD_BALANCER_IP=$(terraform output -raw load_balancer_ip)
+    # LOAD_BALANCER_IP=$(terraform output -raw load_balancer_ip)  # Commented out - load balancer merged into infrastructure
     
+    INFRASTRUCTURE_IP=$(terraform output -raw infrastructure_ip)
     print_status "Testing health endpoint..."
-    if curl -f -s "http://$LOAD_BALANCER_IP/health" > /dev/null; then
+    if curl -f -s "http://$INFRASTRUCTURE_IP/health" > /dev/null; then
         print_success "Health check passed"
     else
         print_error "Health check failed"
     fi
     
     print_status "Testing API Gateway..."
-    if curl -f -s "http://$LOAD_BALANCER_IP/api/v1/health" > /dev/null; then
+    if curl -f -s "http://$INFRASTRUCTURE_IP/api/v1/health" > /dev/null; then
         print_success "API Gateway is responding"
     else
         print_warning "API Gateway might not be ready yet (this is normal during startup)"
@@ -201,7 +225,7 @@ main() {
     plan_terraform
     
     echo ""
-    print_warning "This will create 12 Digital Ocean droplets (~$144/month)"
+    print_warning "This will create 12 Digital Ocean droplets (~$48/month)"
     read -p "Do you want to continue? (y/N): " -n 1 -r
     echo ""
     

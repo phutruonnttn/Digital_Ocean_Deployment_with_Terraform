@@ -8,7 +8,7 @@ resource "digitalocean_droplet" "infrastructure" {
   name   = "${var.app_namespace}-infrastructure"
   image  = var.do_image
   region = var.do_region
-  size   = var.do_size_medium
+  size   = "s-1vcpu-2gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
@@ -22,6 +22,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "export DEBIAN_FRONTEND=noninteractive",
       "apt update -y",
       "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
@@ -44,7 +45,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Eureka Registry
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network -p 8761:8761 --restart unless-stopped yushan/eureka-server:latest"
+      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network -p 8761:8761 --restart unless-stopped ghcr.io/${var.github_username}/yushan-platform-service-registry:latest"
     ]
   }
 
@@ -58,7 +59,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Config Server
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped yushan/config-server:latest"
+      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
     ]
   }
 
@@ -72,7 +73,38 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy API Gateway
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network -p 8080:8080 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped yushan/api-gateway:latest"
+      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network -p 8080:8080 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-api-gateway:latest"
+    ]
+  }
+
+  # In case deploy Nginx in same droplet with infrastructure droplet
+  # Install Nginx
+  provisioner "remote-exec" {
+    inline = [
+      "export DEBIAN_FRONTEND=noninteractive",
+      "apt update -y",
+      "apt install -y nginx",
+      "systemctl start nginx",
+      "systemctl enable nginx"
+    ]
+  }
+
+  # Configure Nginx
+  provisioner "file" {
+    content = templatefile("${path.module}/templates/nginx.conf.tftpl", {
+      api_gateway_ip = self.ipv4_address
+      api_gateway_port = 8080
+    })
+    destination = "/etc/nginx/sites-available/default"
+  }
+
+  # Enable Nginx config
+  provisioner "remote-exec" {
+    inline = [
+      "ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/",
+      "rm -f /etc/nginx/sites-enabled/default",
+      "nginx -t",
+      "systemctl reload nginx"
     ]
   }
 }
