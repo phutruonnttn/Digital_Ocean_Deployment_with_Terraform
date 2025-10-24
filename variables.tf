@@ -95,20 +95,26 @@ variable "jwt_secret" {
 variable "mail_host" {
   description = "Mail server host"
   type        = string
-  default     = "smtp.gmail.com"
+  default     = "smtp.qq.com"
 }
 
 variable "mail_username" {
   description = "Mail username"
   type        = string
-  default     = "noreply@yushan.com"
+  default     = "1784304095@qq.com"
 }
 
 variable "mail_password" {
   description = "Mail password"
   type        = string
   sensitive   = true
-  default     = ""
+  default     = "fmgjizhjdbbabiib"
+}
+
+variable "mail_port" {
+  description = "Mail server port"
+  type        = string
+  default     = "465"
 }
 
 # S3/Spaces Configuration

@@ -8,7 +8,7 @@ resource "digitalocean_droplet" "infrastructure" {
   name   = "${var.app_namespace}-infrastructure"
   image  = var.do_image
   region = var.do_region
-  size   = "s-1vcpu-2gb"
+  size   = "s-2vcpu-4gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
@@ -45,7 +45,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Eureka Registry
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network -p 8761:8761 --restart unless-stopped ghcr.io/${var.github_username}/yushan-platform-service-registry:latest"
+      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network -p 8761:8761 -e SPRING_PROFILES_ACTIVE=docker --restart unless-stopped ghcr.io/${var.github_username}/yushan-platform-service-registry:latest"
     ]
   }
 
@@ -59,7 +59,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Config Server
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
+      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e SPRING_PROFILES_ACTIVE=native -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
     ]
   }
 
@@ -73,7 +73,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy API Gateway
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network -p 8080:8080 -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-api-gateway:latest"
+      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-api-gateway:latest"
     ]
   }
 

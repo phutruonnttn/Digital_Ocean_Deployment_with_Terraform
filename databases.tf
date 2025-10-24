@@ -3,7 +3,7 @@ resource "digitalocean_droplet" "user_db" {
   name   = "${var.app_namespace}-user-db"
   image  = var.do_image
   region = var.do_region
-  size   = var.do_size_large
+  size   = "s-1vcpu-1gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
@@ -49,7 +49,7 @@ resource "digitalocean_droplet" "content_db" {
   name   = "${var.app_namespace}-content-db"
   image  = var.do_image
   region = var.do_region
-  size   = var.do_size_large
+  size   = "s-2vcpu-4gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
@@ -149,7 +149,7 @@ resource "digitalocean_droplet" "engagement_db" {
   name   = "${var.app_namespace}-engagement-db"
   image  = var.do_image
   region = var.do_region
-  size   = var.do_size_large
+  size   = "s-1vcpu-1gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
@@ -195,7 +195,7 @@ resource "digitalocean_droplet" "gamification_db" {
   name   = "${var.app_namespace}-gamification-db"
   image  = var.do_image
   region = var.do_region
-  size   = var.do_size_large
+  size   = "s-1vcpu-1gb"
 
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 
