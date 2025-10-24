@@ -17,15 +17,26 @@ resource "digitalocean_droplet" "user_db" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "export DEBIAN_FRONTEND=noninteractive",
+      "echo \"Starting Docker installation...\"",
       "apt update -y",
-      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common",
+      "echo \"Adding Docker GPG key...\"",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+      "echo \"Adding Docker repository...\"",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
       "apt update -y",
+      "echo \"Installing Docker packages...\"",
       "apt install -y docker-ce docker-ce-cli containerd.io",
+      "echo \"Starting Docker service...\"",
       "systemctl start docker",
-      "systemctl enable docker"
+      "systemctl enable docker",
+      "usermod -aG docker root",
+      "sleep 5",
+      "echo \"Verifying Docker installation...\"",
+      "docker --version",
+      "echo \"Docker installation completed successfully\""
     ]
   }
 
@@ -63,15 +74,26 @@ resource "digitalocean_droplet" "content_db" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "export DEBIAN_FRONTEND=noninteractive",
+      "echo \"Starting Docker installation...\"",
       "apt update -y",
-      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common",
+      "echo \"Adding Docker GPG key...\"",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+      "echo \"Adding Docker repository...\"",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
       "apt update -y",
+      "echo \"Installing Docker packages...\"",
       "apt install -y docker-ce docker-ce-cli containerd.io",
+      "echo \"Starting Docker service...\"",
       "systemctl start docker",
-      "systemctl enable docker"
+      "systemctl enable docker",
+      "usermod -aG docker root",
+      "sleep 5",
+      "echo \"Verifying Docker installation...\"",
+      "docker --version",
+      "echo \"Docker installation completed successfully\""
     ]
   }
 
@@ -163,15 +185,26 @@ resource "digitalocean_droplet" "engagement_db" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "export DEBIAN_FRONTEND=noninteractive",
+      "echo \"Starting Docker installation...\"",
       "apt update -y",
-      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common",
+      "echo \"Adding Docker GPG key...\"",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+      "echo \"Adding Docker repository...\"",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
       "apt update -y",
+      "echo \"Installing Docker packages...\"",
       "apt install -y docker-ce docker-ce-cli containerd.io",
+      "echo \"Starting Docker service...\"",
       "systemctl start docker",
-      "systemctl enable docker"
+      "systemctl enable docker",
+      "usermod -aG docker root",
+      "sleep 5",
+      "echo \"Verifying Docker installation...\"",
+      "docker --version",
+      "echo \"Docker installation completed successfully\""
     ]
   }
 
@@ -209,15 +242,26 @@ resource "digitalocean_droplet" "gamification_db" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "export DEBIAN_FRONTEND=noninteractive",
+      "echo \"Starting Docker installation...\"",
       "apt update -y",
-      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common",
+      "echo \"Adding Docker GPG key...\"",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+      "echo \"Adding Docker repository...\"",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
       "apt update -y",
+      "echo \"Installing Docker packages...\"",
       "apt install -y docker-ce docker-ce-cli containerd.io",
+      "echo \"Starting Docker service...\"",
       "systemctl start docker",
-      "systemctl enable docker"
+      "systemctl enable docker",
+      "usermod -aG docker root",
+      "sleep 5",
+      "echo \"Verifying Docker installation...\"",
+      "docker --version",
+      "echo \"Docker installation completed successfully\""
     ]
   }
 

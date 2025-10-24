@@ -22,16 +22,26 @@ resource "digitalocean_droplet" "infrastructure" {
   # Install Docker
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "export DEBIAN_FRONTEND=noninteractive",
+      "echo \"Starting Docker installation...\"",
       "apt update -y",
-      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+      "apt install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common",
+      "echo \"Adding Docker GPG key...\"",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+      "echo \"Adding Docker repository...\"",
+      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
       "apt update -y",
+      "echo \"Installing Docker packages...\"",
       "apt install -y docker-ce docker-ce-cli containerd.io",
+      "echo \"Starting Docker service...\"",
       "systemctl start docker",
       "systemctl enable docker",
-      "usermod -aG docker root"
+      "usermod -aG docker root",
+      "sleep 5",
+      "echo \"Verifying Docker installation...\"",
+      "docker --version",
+      "echo \"Docker installation completed successfully\""
     ]
   }
 
@@ -59,7 +69,7 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Config Server
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e SPRING_PROFILES_ACTIVE=native -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
+      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e SPRING_PROFILES_ACTIVE=native -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ -e ELASTICSEARCH_URL=http://${digitalocean_droplet.content_db.ipv4_address}:9200 --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
     ]
   }
 
