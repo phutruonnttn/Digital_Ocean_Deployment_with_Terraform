@@ -122,14 +122,12 @@ variable "spaces_access_key" {
   description = "Digital Ocean Spaces access key"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 variable "spaces_secret_key" {
   description = "Digital Ocean Spaces secret key"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 variable "spaces_bucket" {

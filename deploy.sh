@@ -130,14 +130,44 @@ plan_terraform() {
         terraform plan \
             -var="do_token=$DO_PAT" \
             -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
-            -var="github_username=$GITHUB_USERNAME"
+            -var="github_username=$GITHUB_USERNAME" \
+            -var="do_region=$DO_REGION" \
+            -var="do_image=$DO_IMAGE" \
+            -var="app_namespace=$APP_NAMESPACE" \
+            -var="environment=$ENVIRONMENT" \
+            -var="db_password=$DB_PASSWORD" \
+            -var="redis_password=$REDIS_PASSWORD" \
+            -var="jwt_secret=$JWT_SECRET" \
+            -var="mail_host=$MAIL_HOST" \
+            -var="mail_username=$MAIL_USERNAME" \
+            -var="mail_password=$MAIL_PASSWORD" \
+            -var="mail_port=$MAIL_PORT" \
+            -var="spaces_access_key=$SPACES_ACCESS_KEY" \
+            -var="spaces_secret_key=$SPACES_SECRET_KEY" \
+            -var="spaces_bucket=$SPACES_BUCKET" \
+            -var="spaces_endpoint=$SPACES_ENDPOINT"
     else
         terraform plan \
             -var="do_token=$DO_PAT" \
             -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
             -var="docker_host=$DOCKER_HOST_IP" \
             -var="docker_cert_path=$DOCKER_CERT_PATH" \
-            -var="github_username=$GITHUB_USERNAME"
+            -var="github_username=$GITHUB_USERNAME" \
+            -var="do_region=$DO_REGION" \
+            -var="do_image=$DO_IMAGE" \
+            -var="app_namespace=$APP_NAMESPACE" \
+            -var="environment=$ENVIRONMENT" \
+            -var="db_password=$DB_PASSWORD" \
+            -var="redis_password=$REDIS_PASSWORD" \
+            -var="jwt_secret=$JWT_SECRET" \
+            -var="mail_host=$MAIL_HOST" \
+            -var="mail_username=$MAIL_USERNAME" \
+            -var="mail_password=$MAIL_PASSWORD" \
+            -var="mail_port=$MAIL_PORT" \
+            -var="spaces_access_key=$SPACES_ACCESS_KEY" \
+            -var="spaces_secret_key=$SPACES_SECRET_KEY" \
+            -var="spaces_bucket=$SPACES_BUCKET" \
+            -var="spaces_endpoint=$SPACES_ENDPOINT"
     fi
     
     print_success "Terraform plan completed"
@@ -151,14 +181,44 @@ apply_terraform() {
         terraform apply -auto-approve \
             -var="do_token=$DO_PAT" \
             -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
-            -var="github_username=$GITHUB_USERNAME"
+            -var="github_username=$GITHUB_USERNAME" \
+            -var="do_region=$DO_REGION" \
+            -var="do_image=$DO_IMAGE" \
+            -var="app_namespace=$APP_NAMESPACE" \
+            -var="environment=$ENVIRONMENT" \
+            -var="db_password=$DB_PASSWORD" \
+            -var="redis_password=$REDIS_PASSWORD" \
+            -var="jwt_secret=$JWT_SECRET" \
+            -var="mail_host=$MAIL_HOST" \
+            -var="mail_username=$MAIL_USERNAME" \
+            -var="mail_password=$MAIL_PASSWORD" \
+            -var="mail_port=$MAIL_PORT" \
+            -var="spaces_access_key=$SPACES_ACCESS_KEY" \
+            -var="spaces_secret_key=$SPACES_SECRET_KEY" \
+            -var="spaces_bucket=$SPACES_BUCKET" \
+            -var="spaces_endpoint=$SPACES_ENDPOINT"
     else
         terraform apply -auto-approve \
             -var="do_token=$DO_PAT" \
             -var="ssh_private_key=$SSH_PRIVATE_KEY_PATH" \
             -var="docker_host=$DOCKER_HOST_IP" \
             -var="docker_cert_path=$DOCKER_CERT_PATH" \
-            -var="github_username=$GITHUB_USERNAME"
+            -var="github_username=$GITHUB_USERNAME" \
+            -var="do_region=$DO_REGION" \
+            -var="do_image=$DO_IMAGE" \
+            -var="app_namespace=$APP_NAMESPACE" \
+            -var="environment=$ENVIRONMENT" \
+            -var="db_password=$DB_PASSWORD" \
+            -var="redis_password=$REDIS_PASSWORD" \
+            -var="jwt_secret=$JWT_SECRET" \
+            -var="mail_host=$MAIL_HOST" \
+            -var="mail_username=$MAIL_USERNAME" \
+            -var="mail_password=$MAIL_PASSWORD" \
+            -var="mail_port=$MAIL_PORT" \
+            -var="spaces_access_key=$SPACES_ACCESS_KEY" \
+            -var="spaces_secret_key=$SPACES_SECRET_KEY" \
+            -var="spaces_bucket=$SPACES_BUCKET" \
+            -var="spaces_endpoint=$SPACES_ENDPOINT"
     fi
     
     print_success "Terraform deployment completed"
