@@ -55,7 +55,11 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Eureka Registry
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network -p 8761:8761 -e SPRING_PROFILES_ACTIVE=docker --restart unless-stopped ghcr.io/${var.github_username}/yushan-platform-service-registry:latest"
+      "docker run -d --name ${var.app_namespace}-eureka --network ${var.app_namespace}-network \\",
+      "  -p 8761:8761 \\",
+      "  -e SPRING_PROFILES_ACTIVE=docker \\",
+      "  --restart unless-stopped \\",
+      "  ghcr.io/${var.github_username}/yushan-platform-service-registry:latest"
     ]
   }
 
@@ -69,7 +73,13 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Config Server
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network -p 8888:8888 -e SPRING_PROFILES_ACTIVE=native -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ -e ELASTICSEARCH_URL=http://${digitalocean_droplet.content_db.ipv4_address}:9200 --restart unless-stopped ghcr.io/${var.github_username}/yushan-config-server:latest"
+      "docker run -d --name ${var.app_namespace}-config-server --network ${var.app_namespace}-network \\",
+      "  -p 8888:8888 \\",
+      "  -e SPRING_PROFILES_ACTIVE=native \\",
+      "  -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ \\",
+      "  -e ELASTICSEARCH_URL=http://${digitalocean_droplet.content_db.ipv4_address}:9200 \\",
+      "  --restart unless-stopped \\",
+      "  ghcr.io/${var.github_username}/yushan-config-server:latest"
     ]
   }
 
@@ -83,14 +93,37 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy Kafka
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-kafka --network ${var.app_namespace}-network --user root -p 9092:9092 -v ${var.app_namespace}-kafka-data:/var/lib/kafka/data -e KAFKA_NODE_ID=1 -e KAFKA_PROCESS_ROLES=broker,controller -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@${var.app_namespace}-kafka:29093 -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER -e KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT_INTERNAL -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${digitalocean_droplet.infrastructure.ipv4_address}:9092,PLAINTEXT_INTERNAL://${var.app_namespace}-kafka:29092 -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -e KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 -e KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true -e KAFKA_LOG_DIRS=/var/lib/kafka/data -e CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk --restart unless-stopped confluentinc/cp-kafka:7.4.0"
+      "docker run -d --name ${var.app_namespace}-kafka --network ${var.app_namespace}-network --user root \\",
+      "  -p 9092:9092 \\",
+      "  -v ${var.app_namespace}-kafka-data:/var/lib/kafka/data \\",
+      "  -e KAFKA_NODE_ID=1 \\",
+      "  -e KAFKA_PROCESS_ROLES=broker,controller \\",
+      "  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@${var.app_namespace}-kafka:29093 \\",
+      "  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \\",
+      "  -e KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT_INTERNAL \\",
+      "  -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093 \\",
+      "  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${digitalocean_droplet.infrastructure.ipv4_address}:9092,PLAINTEXT_INTERNAL://${var.app_namespace}-kafka:29092 \\",
+      "  -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT \\",
+      "  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \\",
+      "  -e KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 \\",
+      "  -e KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 \\",
+      "  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true \\",
+      "  -e KAFKA_LOG_DIRS=/var/lib/kafka/data \\",
+      "  -e CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk \\",
+      "  --restart unless-stopped \\",
+      "  confluentinc/cp-kafka:7.4.0"
     ]
   }
 
   # Deploy Zookeeper for Kafka
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-zookeeper --network ${var.app_namespace}-network -p 2181:2181 -e ZOOKEEPER_CLIENT_PORT=2181 -e ZOOKEEPER_TICK_TIME=2000 --restart unless-stopped confluentinc/cp-zookeeper:latest"
+      "docker run -d --name ${var.app_namespace}-zookeeper --network ${var.app_namespace}-network \\",
+      "  -p 2181:2181 \\",
+      "  -e ZOOKEEPER_CLIENT_PORT=2181 \\",
+      "  -e ZOOKEEPER_TICK_TIME=2000 \\",
+      "  --restart unless-stopped \\",
+      "  confluentinc/cp-zookeeper:latest"
     ]
   }
 
@@ -104,7 +137,12 @@ resource "digitalocean_droplet" "infrastructure" {
   # Deploy API Gateway
   provisioner "remote-exec" {
     inline = [
-      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ --restart unless-stopped ghcr.io/${var.github_username}/yushan-api-gateway:latest"
+      "docker run -d --name ${var.app_namespace}-api-gateway --network ${var.app_namespace}-network \\",
+      "  -p 8080:8080 \\",
+      "  -e SPRING_PROFILES_ACTIVE=docker \\",
+      "  -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${var.app_namespace}-eureka:8761/eureka/ \\",
+      "  --restart unless-stopped \\",
+      "  ghcr.io/${var.github_username}/yushan-api-gateway:latest"
     ]
   }
 
