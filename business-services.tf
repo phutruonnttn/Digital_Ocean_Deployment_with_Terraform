@@ -44,6 +44,10 @@ resource "digitalocean_droplet" "user_service" {
   provisioner "remote-exec" {
     inline = [
       "docker run -d --name ${var.app_namespace}-user-service --restart unless-stopped -p 8081:8081 \\",
+      "  --log-driver=syslog \\",
+      "  --log-opt syslog-address=udp://${var.logstash_host}:${var.logstash_port} \\",
+      "  --log-opt tag=\"user-service\" \\",
+      "  --log-opt syslog-facility=local0 \\",
       "  -e SPRING_PROFILES_ACTIVE=default \\",
       "  -e DB_USERNAME=yushan_user -e DB_PASSWORD=${var.db_password} -e DB_NAME=yushan_user \\",
       "  -e DB_HOST=${digitalocean_droplet.user_db.ipv4_address} -e DB_PORT=5432 \\",
@@ -106,6 +110,10 @@ resource "digitalocean_droplet" "content_service" {
   provisioner "remote-exec" {
     inline = [
       "docker run -d --name ${var.app_namespace}-content-service --restart unless-stopped -p 8082:8082 \\",
+      "  --log-driver=syslog \\",
+      "  --log-opt syslog-address=udp://${var.logstash_host}:${var.logstash_port} \\",
+      "  --log-opt tag=\"content-service\" \\",
+      "  --log-opt syslog-facility=local0 \\",
       "  -e SPRING_PROFILES_ACTIVE=default \\",
       "  -e DB_USERNAME=yushan_content -e DB_PASSWORD=${var.db_password} -e DB_NAME=yushan_content \\",
       "  -e DB_HOST=${digitalocean_droplet.content_db.ipv4_address} -e DB_PORT=5432 \\",
@@ -168,6 +176,10 @@ resource "digitalocean_droplet" "engagement_service" {
   provisioner "remote-exec" {
     inline = [
       "docker run -d --name ${var.app_namespace}-engagement-service --restart unless-stopped -p 8084:8084 \\",
+      "  --log-driver=syslog \\",
+      "  --log-opt syslog-address=udp://${var.logstash_host}:${var.logstash_port} \\",
+      "  --log-opt tag=\"engagement-service\" \\",
+      "  --log-opt syslog-facility=local0 \\",
       "  -e SPRING_PROFILES_ACTIVE=default \\",
       "  -e DB_USERNAME=yushan_engagement -e DB_PASSWORD=${var.db_password} -e DB_NAME=yushan_engagement \\",
       "  -e DB_HOST=${digitalocean_droplet.engagement_db.ipv4_address} -e DB_PORT=5432 \\",
@@ -231,6 +243,10 @@ resource "digitalocean_droplet" "gamification_service" {
   provisioner "remote-exec" {
     inline = [
       "docker run -d --name ${var.app_namespace}-gamification-service --restart unless-stopped -p 8085:8085 \\",
+      "  --log-driver=syslog \\",
+      "  --log-opt syslog-address=udp://${var.logstash_host}:${var.logstash_port} \\",
+      "  --log-opt tag=\"gamification-service\" \\",
+      "  --log-opt syslog-facility=local0 \\",
       "  -e SPRING_PROFILES_ACTIVE=default \\",
       "  -e DB_USERNAME=yushan_gamification -e DB_PASSWORD=${var.db_password} -e DB_NAME=yushan_gamification \\",
       "  -e DB_HOST=${digitalocean_droplet.gamification_db.ipv4_address} -e DB_PORT=5432 \\",
@@ -248,6 +264,10 @@ resource "digitalocean_droplet" "gamification_service" {
   provisioner "remote-exec" {
     inline = [
       "docker run -d --name ${var.app_namespace}-analytics-service --restart unless-stopped -p 8083:8083 \\",
+      "  --log-driver=syslog \\",
+      "  --log-opt syslog-address=udp://${var.logstash_host}:${var.logstash_port} \\",
+      "  --log-opt tag=\"analytics-service\" \\",
+      "  --log-opt syslog-facility=local0 \\",
       "  -e SPRING_PROFILES_ACTIVE=default \\",
       "  -e DB_URL=jdbc:postgresql://${digitalocean_droplet.gamification_db.ipv4_address}:5433/yushan_analytics \\",
       "  -e DB_USERNAME=yushan_analytics -e DB_PASSWORD=${var.db_password} -e DB_NAME=yushan_analytics \\",

@@ -52,6 +52,17 @@ check_environment() {
         exit 1
     fi
     
+    # Check monitoring configuration
+    if [ -z "$LOGSTASH_HOST" ]; then
+        print_warning "LOGSTASH_HOST not set, using default: 167.172.77.106"
+        export LOGSTASH_HOST="167.172.77.106"
+    fi
+    
+    if [ -z "$LOGSTASH_PORT" ]; then
+        print_warning "LOGSTASH_PORT not set, using default: 514"
+        export LOGSTASH_PORT="514"
+    fi
+    
     print_success "Environment variables checked"
 }
 
@@ -145,7 +156,9 @@ plan_terraform() {
             -var="spaces_access_key=$SPACES_ACCESS_KEY" \
             -var="spaces_secret_key=$SPACES_SECRET_KEY" \
             -var="spaces_bucket=$SPACES_BUCKET" \
-            -var="spaces_endpoint=$SPACES_ENDPOINT"
+            -var="spaces_endpoint=$SPACES_ENDPOINT" \
+            -var="logstash_host=$LOGSTASH_HOST" \
+            -var="logstash_port=$LOGSTASH_PORT"
     else
         terraform plan \
             -var="do_token=$DO_PAT" \
@@ -167,7 +180,9 @@ plan_terraform() {
             -var="spaces_access_key=$SPACES_ACCESS_KEY" \
             -var="spaces_secret_key=$SPACES_SECRET_KEY" \
             -var="spaces_bucket=$SPACES_BUCKET" \
-            -var="spaces_endpoint=$SPACES_ENDPOINT"
+            -var="spaces_endpoint=$SPACES_ENDPOINT" \
+            -var="logstash_host=$LOGSTASH_HOST" \
+            -var="logstash_port=$LOGSTASH_PORT"
     fi
     
     print_success "Terraform plan completed"
@@ -196,7 +211,9 @@ apply_terraform() {
             -var="spaces_access_key=$SPACES_ACCESS_KEY" \
             -var="spaces_secret_key=$SPACES_SECRET_KEY" \
             -var="spaces_bucket=$SPACES_BUCKET" \
-            -var="spaces_endpoint=$SPACES_ENDPOINT"
+            -var="spaces_endpoint=$SPACES_ENDPOINT" \
+            -var="logstash_host=$LOGSTASH_HOST" \
+            -var="logstash_port=$LOGSTASH_PORT"
     else
         terraform apply -auto-approve \
             -var="do_token=$DO_PAT" \
@@ -218,7 +235,9 @@ apply_terraform() {
             -var="spaces_access_key=$SPACES_ACCESS_KEY" \
             -var="spaces_secret_key=$SPACES_SECRET_KEY" \
             -var="spaces_bucket=$SPACES_BUCKET" \
-            -var="spaces_endpoint=$SPACES_ENDPOINT"
+            -var="spaces_endpoint=$SPACES_ENDPOINT" \
+            -var="logstash_host=$LOGSTASH_HOST" \
+            -var="logstash_port=$LOGSTASH_PORT"
     fi
     
     print_success "Terraform deployment completed"
@@ -245,6 +264,12 @@ show_results() {
     print_status "Eureka Registry: $(terraform output -raw eureka_url)"
     print_status "Config Server: $(terraform output -raw config_server_url)"
     print_status "API Gateway: $(terraform output -raw api_gateway_url)"
+    echo ""
+    
+    print_status "Monitoring Configuration:"
+    print_status "Logstash Host: $LOGSTASH_HOST"
+    print_status "Logstash Port: $LOGSTASH_PORT"
+    print_status "All services will send logs to: udp://$LOGSTASH_HOST:$LOGSTASH_PORT"
     echo ""
 }
 

@@ -62,6 +62,19 @@ variable "github_username" {
   default     = "maugus0"
 }
 
+# Monitoring Configuration
+variable "logstash_host" {
+  description = "Logstash host for centralized logging"
+  type        = string
+  default     = "167.172.77.106"
+}
+
+variable "logstash_port" {
+  description = "Logstash syslog port"
+  type        = string
+  default     = "514"
+}
+
 variable "environment" {
   description = "Environment (dev, staging, production)"
   type        = string
