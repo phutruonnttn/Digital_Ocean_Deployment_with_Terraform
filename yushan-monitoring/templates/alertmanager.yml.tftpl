@@ -1,0 +1,71 @@
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@yushan.com'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  routes:
+  - match:
+      severity: critical
+    receiver: 'critical-alerts'
+  - match:
+      severity: warning
+    receiver: 'warning-alerts'
+
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://127.0.0.1:5001/'
+
+- name: 'critical-alerts'
+  email_configs:
+  - to: '${email}'
+    subject: '[CRITICAL] Yushan Alert: {{ .GroupLabels.alertname }}'
+    body: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      {{ end }}
+  %{ if slack_webhook != "" }
+  slack_configs:
+  - api_url: '${slack_webhook}'
+    channel: '#alerts'
+    title: '[CRITICAL] Yushan Alert'
+    text: |
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      {{ end }}
+  %{ endif }
+
+- name: 'warning-alerts'
+  email_configs:
+  - to: '${email}'
+    subject: '[WARNING] Yushan Alert: {{ .GroupLabels.alertname }}'
+    body: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      {{ end }}
+  %{ if slack_webhook != "" }
+  slack_configs:
+  - api_url: '${slack_webhook}'
+    channel: '#alerts'
+    title: '[WARNING] Yushan Alert'
+    text: |
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      {{ end }}
+  %{ endif }
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

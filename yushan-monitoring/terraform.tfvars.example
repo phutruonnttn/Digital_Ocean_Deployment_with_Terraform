@@ -1,0 +1,55 @@
+# Digital Ocean Configuration
+do_token = "dop_v1_your_new_token_here"
+do_region = "sgp1"
+do_image = "ubuntu-22-04-x64"
+
+# SSH Configuration
+ssh_private_key = "~/.ssh/id_rsa"
+do_ssh_key_name = "yushan-monitoring-ssh-key"
+
+# Application Configuration
+app_namespace = "yushan-monitoring"
+environment = "production"
+
+# Existing Infrastructure Configuration (from main deployment)
+existing_infrastructure_ip = "167.172.72.189"
+
+existing_service_ips = {
+  "user_service" = "167.71.216.54"
+  "content_service" = "157.245.153.167"
+  "engagement_service" = "167.172.65.76"
+  "gamification_service" = "139.59.243.188"
+}
+
+existing_db_ips = {
+  "user_db" = "165.22.253.32"
+  "content_db" = "188.166.254.179"
+  "engagement_db" = "206.189.144.116"
+  "gamification_db" = "178.128.83.217"
+}
+
+# Droplet Sizes
+do_size_logging = "s-4vcpu-8gb"    # $48/month
+do_size_monitoring = "s-2vcpu-4gb"  # $24/month
+
+# Logging Configuration
+elasticsearch_password = "yushan_elasticsearch_password_2024"
+kibana_password = "yushan_kibana_password_2024"
+logstash_password = "yushan_logstash_password_2024"
+
+# Monitoring Configuration
+prometheus_password = "yushan_prometheus_password_2024"
+grafana_password = "yushan_grafana_password_2024"
+grafana_admin_user = "admin"
+
+# Alerting Configuration
+alertmanager_slack_webhook = ""  # Optional
+alertmanager_email = "admin@yushan.com"
+
+# Retention Configuration
+elasticsearch_retention_days = 30
+prometheus_retention_days = 15
+
+# Security Configuration
+enable_ssl = true
+domain_name = ""  # Optional

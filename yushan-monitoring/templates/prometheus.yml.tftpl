@@ -1,0 +1,94 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['${monitoring_ip}:9100']
+
+  # cAdvisor
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['${monitoring_ip}:8080']
+
+  # Infrastructure Services
+  - job_name: 'infrastructure'
+    static_configs:
+      - targets: ['167.172.72.189:8080']  # API Gateway
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 30s
+
+  # User Service
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['167.71.216.54:8081']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 30s
+
+  # Content Service
+  - job_name: 'content-service'
+    static_configs:
+      - targets: ['157.245.153.167:8082']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 30s
+
+  # Engagement Service
+  - job_name: 'engagement-service'
+    static_configs:
+      - targets: ['167.172.65.76:8084']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 30s
+
+  # Gamification Service
+  - job_name: 'gamification-service'
+    static_configs:
+      - targets: ['139.59.243.188:8085']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 30s
+
+  # Database Services
+  - job_name: 'user-db'
+    static_configs:
+      - targets: ['165.22.253.32:5432']
+    scrape_interval: 60s
+
+  - job_name: 'content-db'
+    static_configs:
+      - targets: ['188.166.254.179:5432']
+    scrape_interval: 60s
+
+  - job_name: 'engagement-db'
+    static_configs:
+      - targets: ['206.189.144.116:5432']
+    scrape_interval: 60s
+
+  - job_name: 'gamification-db'
+    static_configs:
+      - targets: ['178.128.83.217:5432']
+    scrape_interval: 60s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: 
+          - '165.22.253.32:6379'
+          - '188.166.254.179:6379'
+          - '206.189.144.116:6379'
+          - '178.128.83.217:6379'
+    scrape_interval: 30s
